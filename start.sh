@@ -295,6 +295,14 @@ if [ -f "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dt" ]; then
 	logstep "Copying DTB..."
 	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dt" "$DEVICE_TREE_PATH/prebuilt/dt.img"
 	logdone
+elif [ -f "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dtb" ]; then
+	loginfo "DTB are not appended to kernel"
+	logstep "Copying kernel..."
+	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-zImage" "$DEVICE_TREE_PATH/prebuilt/zImage"
+	logdone
+	logstep "Copying DTB..."
+	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dtb" "$DEVICE_TREE_PATH/prebuilt/dtb.img"
+	logdone
 else
 	loginfo "DTB are appended to kernel"
 	logstep "Copying kernel..."
@@ -470,6 +478,9 @@ fi
 if [ -f prebuilt/dt.img ]; then
 	echo "TARGET_PREBUILT_KERNEL := \$(DEVICE_PATH)/prebuilt/zImage
 TARGET_PREBUILT_DTB := \$(DEVICE_PATH)/prebuilt/dt.img" >> BoardConfig.mk
+elif [ -f prebuilt/dtb.img ]; then
+	echo "TARGET_PREBUILT_KERNEL := \$(DEVICE_PATH)/prebuilt/zImage
+TARGET_PREBUILT_DTB := \$(DEVICE_PATH)/prebuilt/dtb.img" >> BoardConfig.mk
 else
 	echo "TARGET_PREBUILT_KERNEL := \$(DEVICE_PATH)/prebuilt/zImage-dtb" >> BoardConfig.mk
 fi
@@ -490,7 +501,7 @@ if [ "$KERNEL_HEADER_VERSION" != "0" ]; then
 	echo "BOARD_MKBOOTIMG_ARGS += --header_version \$(BOARD_BOOTIMG_HEADER_VERSION)" >> BoardConfig.mk
 fi
 
-if [ -f prebuilt/dt.img ]; then
+if [ -f prebuilt/dt.img ] || [ -f prebuilt/dtb.img ]; then
 	echo "BOARD_MKBOOTIMG_ARGS += --dt \$(TARGET_PREBUILT_DTB)" >> BoardConfig.mk
 fi
 
