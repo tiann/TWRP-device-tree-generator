@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-VERSION="1.2"
+VERSION="1.3"
 
 SCRIPT_PWD=$(pwd)
 
