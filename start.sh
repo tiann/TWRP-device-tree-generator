@@ -48,6 +48,10 @@ If you don't have it, also install git"
 	exit
 fi
 
+# Clone AIK on startup
+[ -d extract ] && rm -rf extract
+git clone https://github.com/SebaUbuntu/AIK-Linux-mirror extract
+
 # Ask user for device info because we don't use build.prop
 logo
 DEVICE_CODENAME=$(get_info "Insert the device codename (eg. whyred)")
