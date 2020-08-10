@@ -178,7 +178,7 @@ IMAGE_FILESIZE=$(du -b "extract/$DEVICE_CODENAME.img" | cut -f1)
 cd extract
 
 # Obtain recovery.img format info
-./unpackimg.sh --nosudo "$DEVICE_CODENAME.img" > /dev/null 2>&1
+logstep "$(./unpackimg.sh --nosudo "$DEVICE_CODENAME.img")"
 cd ..
 KERNEL_BOOTLOADER_NAME=$(cat "$SPLITIMG_DIR/$DEVICE_CODENAME.img-board")
 KERNEL_CMDLINE=$(cat "$SPLITIMG_DIR/$DEVICE_CODENAME.img-cmdline")
