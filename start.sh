@@ -480,33 +480,33 @@ fi
 
 # Check for dtb image and add it to BoardConfig.mk
 if [ -f prebuilt/dt.img ]; then
-	echo "TARGET_PREBUILT_KERNEL := \$(DEVICE_PATH)/prebuilt/zImage
-TARGET_PREBUILT_DTB := \$(DEVICE_PATH)/prebuilt/dt.img" >> BoardConfig.mk
+	echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
+TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dt.img' >> BoardConfig.mk
 elif [ -f prebuilt/dtb.img ]; then
-	echo "TARGET_PREBUILT_KERNEL := \$(DEVICE_PATH)/prebuilt/zImage
-TARGET_PREBUILT_DTB := \$(DEVICE_PATH)/prebuilt/dtb.img" >> BoardConfig.mk
+	echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
+TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img' >> BoardConfig.mk
 else
-	echo "TARGET_PREBUILT_KERNEL := \$(DEVICE_PATH)/prebuilt/zImage-dtb" >> BoardConfig.mk
+	echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage-dtb' >> BoardConfig.mk
 fi
 
 # Check for dtbo image and add it to BoardConfig.mk
 if [ -f prebuilt/dtbo.img ]; then
-	echo "BOARD_PREBUILT_DTBOIMAGE := \$(DEVICE_PATH)/prebuilt/dtbo.img
-BOARD_INCLUDE_RECOVERY_DTBO := true" >> BoardConfig.mk
+	echo 'BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
+BOARD_INCLUDE_RECOVERY_DTBO := true' >> BoardConfig.mk
 fi
 
 # Additional mkbootimg arguments
-echo "BOARD_MKBOOTIMG_ARGS += --ramdisk_offset \$(BOARD_RAMDISK_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --tags_offset \$(BOARD_KERNEL_TAGS_OFFSET)" >> BoardConfig.mk
+echo 'BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)' >> BoardConfig.mk
 
 # Add kernel header version only if it's different than 0
 # Passing argument 0 to mkbootimg is not allowed
 if [ "$KERNEL_HEADER_VERSION" != "0" ]; then
-	echo "BOARD_MKBOOTIMG_ARGS += --header_version \$(BOARD_BOOTIMG_HEADER_VERSION)" >> BoardConfig.mk
+	echo 'BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)' >> BoardConfig.mk
 fi
 
 if [ -f prebuilt/dt.img ] || [ -f prebuilt/dtb.img ]; then
-	echo "BOARD_MKBOOTIMG_ARGS += --dt \$(TARGET_PREBUILT_DTB)" >> BoardConfig.mk
+	echo 'BOARD_MKBOOTIMG_ARGS += --dt $(TARGET_PREBUILT_DTB)' >> BoardConfig.mk
 fi
 
 # Add flags to support kernel building from source
@@ -575,18 +575,18 @@ PLATFORM_VERSION := 16.1.0
 if [ "$DEVICE_IS_AB" = 1 ]; then
 	echo "# A/B" >> BoardConfig.mk
 	if [ -f recovery.wipe ]; then
-		echo "TARGET_RECOVERY_WIPE := \$(DEVICE_PATH)/recovery/root/etc/recovery.wipe" >> BoardConfig.mk
+		echo 'TARGET_RECOVERY_WIPE := $(DEVICE_PATH)/recovery/root/etc/recovery.wipe' >> BoardConfig.mk
 	fi
 	echo "AB_OTA_UPDATER := true
 TW_INCLUDE_REPACKTOOLS := true" >> BoardConfig.mk
 fi
 
-echo "# TWRP Configuration
+echo '# TWRP Configuration
 TW_THEME := portrait_hdpi
 TW_EXTRA_LANGUAGES := true
 TW_SCREEN_BLANK_ON_BOOT := true
-TW_INPUT_BLACKLIST := \"hbtp_vm\"
-TW_USE_TOOLBOX := true" >> BoardConfig.mk
+TW_INPUT_BLACKLIST := "hbtp_vm"
+TW_USE_TOOLBOX := true' >> BoardConfig.mk
 logdone
 
 case $RAMDISK_COMPRESSION in
@@ -603,68 +603,68 @@ esac
 
 # omni_device.mk
 logstep "Generating omni_$DEVICE_CODENAME.mk..."
-echo "# Specify phone tech before including full_phone
-\$(call inherit-product, vendor/omni/config/gsm.mk)
+echo '# Specify phone tech before including full_phone
+$(call inherit-product, vendor/omni/config/gsm.mk)
 
 # Inherit some common Omni stuff.
-\$(call inherit-product, vendor/omni/config/common.mk)
-\$(call inherit-product, build/target/product/embedded.mk)
+$(call inherit-product, vendor/omni/config/common.mk)
+$(call inherit-product, build/target/product/embedded.mk)
 
 # Inherit Telephony packages
-\$(call inherit-product, \$(SRC_TARGET_DIR)/product/full_base_telephony.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
 # Inherit language packages
-\$(call inherit-product, \$(SRC_TARGET_DIR)/product/languages_full.mk)
-" >> "omni_$DEVICE_CODENAME.mk"
+$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
+' >> "omni_$DEVICE_CODENAME.mk"
 
 # Inherit 64bit things if device is 64bit
 if [ $DEVICE_IS_64BIT = true ]; then
-	echo "# Inherit 64bit support
-\$(call inherit-product, \$(SRC_TARGET_DIR)/product/core_64_bit.mk)
-" >> "omni_$DEVICE_CODENAME.mk"
+	echo '# Inherit 64bit support
+$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
+' >> "omni_$DEVICE_CODENAME.mk"
 fi
 
 # Add A/B flags
 if [ "$DEVICE_IS_AB" = 1 ]; then
-	printf "# A/B
-AB_OTA_PARTITIONS += \\
-    boot \\
-    system" >> "omni_$DEVICE_CODENAME.mk"
+	printf '# A/B
+AB_OTA_PARTITIONS += \
+    boot \
+    system' >> "omni_$DEVICE_CODENAME.mk"
 	if [ "$DEVICE_HAS_VENDOR_PARTITION" = true ]; then
-		echo " \\
-    vendor" >> "omni_$DEVICE_CODENAME.mk"
+		echo ' \
+    vendor' >> "omni_$DEVICE_CODENAME.mk"
 	else
 		echo "" >> "omni_$DEVICE_CODENAME.mk"
 	fi
 	
-	echo "
-AB_OTA_POSTINSTALL_CONFIG += \\
-    RUN_POSTINSTALL_system=true \\
-    POSTINSTALL_PATH_system=system/bin/otapreopt_script \\
-    FILESYSTEM_TYPE_system=ext4 \\
+	echo '
+AB_OTA_POSTINSTALL_CONFIG += \
+    RUN_POSTINSTALL_system=true \
+    POSTINSTALL_PATH_system=system/bin/otapreopt_script \
+    FILESYSTEM_TYPE_system=ext4 \
     POSTINSTALL_OPTIONAL_system=true
 
 # Boot control HAL
-PRODUCT_PACKAGES += \\
-    android.hardware.boot@1.0-impl \\
+PRODUCT_PACKAGES += \
+    android.hardware.boot@1.0-impl \
     android.hardware.boot@1.0-service
 
-PRODUCT_PACKAGES += \\
-    bootctrl.\$(TARGET_BOARD_PLATFORM)
+PRODUCT_PACKAGES += \
+    bootctrl.$(TARGET_BOARD_PLATFORM)
     
-PRODUCT_STATIC_BOOT_CONTROL_HAL := \\
-    bootctrl.\$(TARGET_BOARD_PLATFORM) \\
-    libgptutils \\
-    libz \\
+PRODUCT_STATIC_BOOT_CONTROL_HAL := \
+    bootctrl.$(TARGET_BOARD_PLATFORM) \
+    libgptutils \
+    libz \
     libcutils
     
-PRODUCT_PACKAGES += \\
-    otapreopt_script \\
-    cppreopts.sh \\
-    update_engine \\
-    update_verifier \\
+PRODUCT_PACKAGES += \
+    otapreopt_script \
+    cppreopts.sh \
+    update_engine \
+    update_verifier \
     update_engine_sideload
-" >> "omni_$DEVICE_CODENAME.mk"
+' >> "omni_$DEVICE_CODENAME.mk"
 fi
 
 echo "# Device identifier. This must come after all inclusions
