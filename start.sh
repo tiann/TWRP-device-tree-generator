@@ -693,7 +693,7 @@ logstep "Creating ready-to-push git repo..."
 git init -q
 git add -A
 # Please don't be an ass and keep authorship
-git commit -m "$DEVICE_CODENAME: initial TWRP device tree
+git commit -m "$DEVICE_CODENAME: Initial TWRP device tree
 
 Made with SebaUbuntu's TWRP device tree generator
 Arch: $DEVICE_ARCH
