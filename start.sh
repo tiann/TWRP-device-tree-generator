@@ -505,10 +505,6 @@ if [ -f prebuilt/dt.img ] || [ -f prebuilt/dtb.img ]; then
 	echo "BOARD_MKBOOTIMG_ARGS += --dt \$(TARGET_PREBUILT_DTB)" >> BoardConfig.mk
 fi
 
-if [ "$DEVICE_MANUFACTURER" = "samsung" ]; then
-	echo "BOARD_CUSTOM_BOOTIMG_MK := \$(DEVICE_PATH)/mkbootimg.mk" >> BoardConfig.mk
-fi
-
 # Add flags to support kernel building from source
 if [ "$DEVICE_ARCH" = arm64 ]; then
 	echo "BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb" >> BoardConfig.mk
@@ -686,29 +682,6 @@ logdone
 if [ $DEVICE_IS_SAR = 1 ]; then
 	echo "on fs
 	export ANDROID_ROOT /system_root" >> recovery/root/init.recovery.sar.rc
-fi
-
-# If this is a Samsung device, add support to SEAndroid status and make an Odin-flashable tar
-if [ "$DEVICE_MANUFACTURER" = "samsung" ]; then
-	logstep "This is a Samsung device, appending SEANDROIDENFORCE to recovery image with custom mkbootimg..."
-	echo "LOCAL_PATH := \$(call my-dir)
-
-\$(INSTALLED_BOOTIMAGE_TARGET): \$(MKBOOTIMG) \$(INTERNAL_BOOTIMAGE_FILES)
-	\$(call pretty,\"Target boot image: \$@\")
-	\$(hide) \$(MKBOOTIMG) \$(INTERNAL_BOOTIMAGE_ARGS) \$(BOARD_MKBOOTIMG_ARGS) --output \$@
-	@echo -e \${CL_CYN}\"Made boot image: \$@\"\${CL_RST}
-
-\$(INSTALLED_RECOVERYIMAGE_TARGET): \$(MKBOOTIMG) \
-		\$(recovery_ramdisk) \
-		\$(recovery_kernel)
-	@echo -e \${CL_CYN}\"----- Making recovery image ------\"\${CL_RST}
-	\$(hide) \$(MKBOOTIMG) \$(INTERNAL_RECOVERYIMAGE_ARGS) \$(BOARD_MKBOOTIMG_ARGS) --output \$@
-	@echo -e \${CL_CYN}\"Made recovery image: \$@\"\${CL_RST}
-	@echo -e \${CL_GRN}\"----- Lying about SEAndroid state to Samsung bootloader ------\"\${CL_RST}
-	\$(hide) echo -n \"SEANDROIDENFORCE\" >> \$(INSTALLED_RECOVERYIMAGE_TARGET)
-	\$(hide) \$(call assert-max-image-size,\$@,\$(BOARD_RECOVERYIMAGE_PARTITION_SIZE),raw)
-" >> mkbootimg.mk
-	logdone
 fi
 
 # Automatically create a ready-to-push repo
