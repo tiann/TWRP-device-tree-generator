@@ -106,7 +106,7 @@ clean_screen
 
 logo
 ADB_CHOICE=$(get_boolean "Do you want to add additional flags via ADB? (Optional)
-This can help the script making a better device tree by taking precise data
+This can help the script by taking precise data
 But you need to have the device on hands and adb command needs to be present")
 if [ -z "$ADB_CHOICE" ]; then
 	info "Nothing inserted, assuming ADB won't be used"
@@ -139,8 +139,6 @@ if [ "$ADB_CHOICE" = "1" ]; then
 	if [ $? = 0 ]; then
 		printf "${blue}Device connected, taking values, do not disconnect the device..."
 		DEVICE_SOC_MANUFACTURER=$(adb_get_prop ro.hardware)
-		DEVICE_CPU_VARIANT=$(adb_get_prop ro.bionic.cpu_variant)
-		DEVICE_2ND_CPU_VARIANT=$(adb_get_prop ro.bionic.cpu_variant)
 		echo " done${reset}"
 	else
 		error "Device not connected or ADB is not installed"
@@ -150,14 +148,6 @@ else
 	loginfo "ADB will be skipped"
 fi
 
-if [ "$DEVICE_CPU_VARIANT" = "" ]; then
-	loginfo "Value not found with ADB or ADB has not been used, using generic values for 1st CPU variant"
-	DEVICE_CPU_VARIANT=generic
-fi
-if [ "$DEVICE_2ND_CPU_VARIANT" = "" ]; then
-	loginfo "Value not found with ADB or ADB has not been used, using generic values for 2nd CPU variant"
-	DEVICE_2ND_CPU_VARIANT=generic
-fi
 if [ "$DEVICE_SOC_MANUFACTURER" != "" ]; then
 	loginfo "Device SoC manufacturer is $DEVICE_SOC_MANUFACTURER"
 fi
