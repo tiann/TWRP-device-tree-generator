@@ -315,10 +315,10 @@ else
 fi
 
 # Check if dtbo image is present
-if [ -f "$SPLITIMG_DIR/$DEVICE_CODENAME.img-recoverydtbo" ]; then
+if [ -f "$SPLITIMG_DIR/$DEVICE_CODENAME.img-recovery_dtbo" ]; then
 	loginfo "DTBO image exists"
 	logstep "Copying DTBO..."
-	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-recoverydtbo" "$DEVICE_TREE_PATH/prebuilt/dtbo.img"
+	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-recovery_dtbo" "$DEVICE_TREE_PATH/prebuilt/dtbo.img"
 	logdone
 fi
 
@@ -464,12 +464,12 @@ BOARD_KERNEL_CMDLINE := $KERNEL_CMDLINE" >> BoardConfig.mk
 if [ "$DEVICE_IS_AB" = 1 ]; then
 	echo "BOARD_KERNEL_CMDLINE += skip_override androidboot.fastboot=1" >> BoardConfig.mk
 fi
-echo "BOARD_KERNEL_BASE := 0x$KERNEL_BASEADDRESS
+echo "BOARD_KERNEL_BASE := $KERNEL_BASEADDRESS
 BOARD_KERNEL_PAGESIZE := $KERNEL_PAGESIZE
-BOARD_KERNEL_OFFSET := 0x$KERNEL_OFFSET
-BOARD_RAMDISK_OFFSET := 0x$RAMDISK_OFFSET
-BOARD_SECOND_OFFSET := 0x$KERNEL_SECOND_OFFSET
-BOARD_KERNEL_TAGS_OFFSET := 0x$KERNEL_TAGS_OFFSET
+BOARD_KERNEL_OFFSET := $KERNEL_OFFSET
+BOARD_RAMDISK_OFFSET := $RAMDISK_OFFSET
+BOARD_SECOND_OFFSET := $KERNEL_SECOND_OFFSET
+BOARD_KERNEL_TAGS_OFFSET := $KERNEL_TAGS_OFFSET
 BOARD_FLASH_BLOCK_SIZE := $((KERNEL_PAGESIZE * 64)) # (BOARD_KERNEL_PAGESIZE * 64)" >> BoardConfig.mk
 
 # Add kernel header version only if it's different than 0
