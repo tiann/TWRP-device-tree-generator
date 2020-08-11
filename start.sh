@@ -34,6 +34,8 @@ source ./tools/graphics.sh
 source ./tools/makefiles.sh
 source ./tools/user_interaction.sh
 
+# Setup
+CURRENT_YEAR="$(date +%Y)"
 set_colors
 clean_screen
 logo
@@ -344,14 +346,6 @@ rm -rf $SPLITIMG_DIR
 rm -rf $RAMDISK_DIR
 
 cd "$DEVICE_TREE_PATH"
-
-# License - please keep it as is, thanks
-logstep "Adding license headers..."
-CURRENT_YEAR="$(date +%Y)"
-for file in Android.mk AndroidProducts.mk BoardConfig.mk omni_$DEVICE_CODENAME.mk vendorsetup.sh; do
-	license_headers "$file"
-done
-logdone
 
 # Generate custom fstab if it's not ready
 if [ -f fstab.temp ]; then

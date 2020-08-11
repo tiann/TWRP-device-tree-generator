@@ -2,6 +2,7 @@
 
 make_Android.mk() {
 	logstep "Generating Android.mk..."
+	license_headers Android.mk
 	echo "LOCAL_PATH := \$(call my-dir)
 
 ifeq (\$(TARGET_DEVICE),$DEVICE_CODENAME)
@@ -12,6 +13,7 @@ endif" >> Android.mk
 
 make_AndroidProducts.mk() {
 	logstep "Generating AndroidProducts.mk..."
+	license_headers AndroidProducts.mk
 	echo "PRODUCT_MAKEFILES := \\
 	\$(LOCAL_DIR)/omni_$DEVICE_CODENAME.mk" >> AndroidProducts.mk
 	logdone
@@ -19,6 +21,7 @@ make_AndroidProducts.mk() {
 
 make_BoardConfig.mk() {
 	logstep "Generating BoardConfig.mk..."
+	license_headers BoardConfig.mk
 	echo "DEVICE_PATH := device/$DEVICE_TREE_PATH
 
 # For building with minimal manifest
@@ -177,6 +180,7 @@ TW_USE_TOOLBOX := true' >> BoardConfig.mk
 
 make_omni_device.mk() {
 	logstep "Generating omni_$DEVICE_CODENAME.mk..."
+	license_headers "omni_$DEVICE_CODENAME.mk"
 	echo '# Specify phone tech before including full_phone
 $(call inherit-product, vendor/omni/config/gsm.mk)
 
@@ -253,6 +257,7 @@ PRODUCT_RELEASE_NAME := $DEVICE_FULL_NAME" >> "omni_$DEVICE_CODENAME.mk"
 
 make_vendorsetup.sh() {
 	logstep "Generating vendorsetup.sh..."
+	license_headers vendorsetup.sh
 	echo "add_lunch_combo omni_$DEVICE_CODENAME-userdebug
 add_lunch_combo omni_$DEVICE_CODENAME-eng" >> vendorsetup.sh
 	logdone
