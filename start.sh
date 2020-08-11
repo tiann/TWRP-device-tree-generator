@@ -329,15 +329,6 @@ else
 	logerror "The script haven't found any fstab"
 fi
 
-# Check if recovery.wipe is there
-if [ "$DEVICE_IS_AB" ]; then
-	logstep "Copying A/B stuff..."
-	if [ -f "$RAMDISK_DIR/etc/recovery.wipe" ]; then
-		cp "$RAMDISK_DIR/etc/recovery.wipe" "$DEVICE_TREE_PATH/recovery.wipe"
-	fi
-	logdone
-fi
-
 # Extract init.rc files
 logstep "Extracting init.rc files..."
 for i in $(ls $RAMDISK_DIR | grep ".rc"); do
