@@ -24,7 +24,7 @@ make_BoardConfig.mk() {
 # For building with minimal manifest
 ALLOW_MISSING_DEPENDENCIES := true
 " >> BoardConfig.mk
-	# Use arch values based on what has been found in init binary
+
 	if [ $DEVICE_ARCH = arm64 ]; then
 		echo "# Architecture
 TARGET_ARCH := arm64
@@ -60,7 +60,7 @@ TARGET_CPU_ABI_LIST_32_BIT := x86,armeabi-v7a,armeabi
 TARGET_CPU_VARIANT := generic
 " >> BoardConfig.mk
 	fi
-	# Some stock recovery.img doesn't have board name attached, so just ignore it
+
 	if [ "$BOOTLOADERNAME" != "" ]; then
 		echo "# Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := $KERNEL_BOOTLOADER_NAME
@@ -76,46 +76,14 @@ BOARD_KERNEL_CMDLINE := $KERNEL_CMDLINE" >> BoardConfig.mk
 BOARD_KERNEL_PAGESIZE := $KERNEL_PAGESIZE
 BOARD_RAMDISK_OFFSET := $RAMDISK_OFFSET
 BOARD_KERNEL_TAGS_OFFSET := $KERNEL_TAGS_OFFSET
-BOARD_FLASH_BLOCK_SIZE := $((KERNEL_PAGESIZE * 64)) # (BOARD_KERNEL_PAGESIZE * 64)" >> BoardConfig.mk
-
-	# Add kernel header version only if it's different than 0
-	# Passing argument 0 to mkbootimg is not allowed
+BOARD_FLASH_BLOCK_SIZE := $((KERNEL_PAGESIZE * 64)) # (BOARD_KERNEL_PAGESIZE * 64)
+TARGET_KERNEL_ARCH := $DEVICE_ARCH
+TARGET_KERNEL_HEADER_ARCH := $DEVICE_ARCH
+TARGET_KERNEL_SOURCE := kernel/$DEVICE_MANUFACTURER/$DEVICE_CODENAME
+TARGET_KERNEL_CONFIG := ${DEVICE_CODENAME}_defconfig" >> BoardConfig.mk
 	if [ "$KERNEL_HEADER_VERSION" != "0" ]; then
 		echo "BOARD_BOOTIMG_HEADER_VERSION := $KERNEL_HEADER_VERSION" >> BoardConfig.mk
 	fi
-
-	# Check for dtb image and add it to BoardConfig.mk
-	if [ -f prebuilt/dt.img ]; then
-		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
-TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dt.img' >> BoardConfig.mk
-	elif [ -f prebuilt/dtb.img ]; then
-		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
-TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img' >> BoardConfig.mk
-	else
-		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage-dtb' >> BoardConfig.mk
-	fi
-
-	# Check for dtbo image and add it to BoardConfig.mk
-	if [ -f prebuilt/dtbo.img ]; then
-		echo 'BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
-BOARD_INCLUDE_RECOVERY_DTBO := true' >> BoardConfig.mk
-	fi
-
-	# Additional mkbootimg arguments
-	echo 'BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)' >> BoardConfig.mk
-
-	# Add kernel header version only if it's different than 0
-	# Passing argument 0 to mkbootimg is not allowed
-	if [ "$KERNEL_HEADER_VERSION" != "0" ]; then
-		echo 'BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)' >> BoardConfig.mk
-	fi
-
-	if [ -f prebuilt/dt.img ] || [ -f prebuilt/dtb.img ]; then
-		echo 'BOARD_MKBOOTIMG_ARGS += --dt $(TARGET_PREBUILT_DTB)' >> BoardConfig.mk
-	fi
-
-	# Add flags to support kernel building from source
 	if [ "$DEVICE_ARCH" = arm64 ]; then
 		echo "BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb" >> BoardConfig.mk
 	elif [ "$DEVICE_ARCH" = arm ]; then
@@ -125,14 +93,29 @@ BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)' >> BoardConfi
 	elif [ "$DEVICE_ARCH" = x86_64 ]; then
 		echo "BOARD_KERNEL_IMAGE_NAME := bzImage" >> BoardConfig.mk
 	fi
+	if [ -f prebuilt/dt.img ]; then
+		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
+TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dt.img' >> BoardConfig.mk
+	elif [ -f prebuilt/dtb.img ]; then
+		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
+TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img' >> BoardConfig.mk
+	else
+		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage-dtb' >> BoardConfig.mk
+	fi
+	if [ -f prebuilt/dtbo.img ]; then
+		echo 'BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
+BOARD_INCLUDE_RECOVERY_DTBO := true' >> BoardConfig.mk
+	fi
+	echo 'BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)' >> BoardConfig.mk
+	if [ "$KERNEL_HEADER_VERSION" != "0" ]; then
+		echo 'BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)' >> BoardConfig.mk
+	fi
+	if [ -f prebuilt/dt.img ] || [ -f prebuilt/dtb.img ]; then
+		echo 'BOARD_MKBOOTIMG_ARGS += --dt $(TARGET_PREBUILT_DTB)' >> BoardConfig.mk
+	fi
+	echo "" >> BoardConfig.mk
 
-	echo "TARGET_KERNEL_ARCH := $DEVICE_ARCH
-TARGET_KERNEL_HEADER_ARCH := $DEVICE_ARCH
-TARGET_KERNEL_SOURCE := kernel/$DEVICE_MANUFACTURER/$DEVICE_CODENAME
-TARGET_KERNEL_CONFIG := ${DEVICE_CODENAME}_defconfig
-" >> BoardConfig.mk
-
-	# Add LZMA compression if kernel suppport it
 	case $RAMDISK_COMPRESSION_TYPE in
 		lzma)
 			echo "# LZMA
@@ -141,7 +124,6 @@ LZMA_RAMDISK_TARGETS := recovery
 			;;
 	esac
 
-	# Add system-as-root flags if device system-as-root
 	if [ $DEVICE_IS_SAR = 1 ]; then
 		echo "# System as root
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
