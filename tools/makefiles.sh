@@ -87,23 +87,12 @@ TARGET_KERNEL_CONFIG := ${DEVICE_CODENAME}_defconfig" >> BoardConfig.mk
 	if [ "$KERNEL_HEADER_VERSION" != "0" ]; then
 		echo "BOARD_BOOTIMG_HEADER_VERSION := $KERNEL_HEADER_VERSION" >> BoardConfig.mk
 	fi
-	if [ "$DEVICE_ARCH" = arm64 ]; then
-		echo "BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb" >> BoardConfig.mk
-	elif [ "$DEVICE_ARCH" = arm ]; then
-		echo "BOARD_KERNEL_IMAGE_NAME := zImage-dtb" >> BoardConfig.mk
-	elif [ "$DEVICE_ARCH" = x86 ]; then
-		echo "BOARD_KERNEL_IMAGE_NAME := bzImage" >> BoardConfig.mk
-	elif [ "$DEVICE_ARCH" = x86_64 ]; then
-		echo "BOARD_KERNEL_IMAGE_NAME := bzImage" >> BoardConfig.mk
-	fi
+	echo "BOARD_KERNEL_IMAGE_NAME := $KERNEL_FILENAME" >> BoardConfig.mk
+	echo "TARGET_PREBUILT_KERNEL := \$(DEVICE_PATH)/prebuilt/$KERNEL_FILENAME" >> BoardConfig.mk
 	if [ -f prebuilt/dt.img ]; then
-		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
-TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dt.img' >> BoardConfig.mk
+		echo 'TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dt.img' >> BoardConfig.mk
 	elif [ -f prebuilt/dtb.img ]; then
-		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
-TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img' >> BoardConfig.mk
-	else
-		echo 'TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage-dtb' >> BoardConfig.mk
+		echo 'TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img' >> BoardConfig.mk
 	fi
 	if [ -f prebuilt/dtbo.img ]; then
 		echo 'BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img

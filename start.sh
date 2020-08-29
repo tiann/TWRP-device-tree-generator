@@ -249,17 +249,21 @@ if echo "$BINARY" | grep -q ARM; then
 	if echo "$BINARY" | grep -q aarch64; then
 		DEVICE_ARCH=arm64
 		DEVICE_IS_64BIT=true
+		KERNEL_FILENAME=Image.gz
 	else
 		DEVICE_ARCH=arm
 		DEVICE_IS_64BIT=false
+		KERNEL_FILENAME=zImage
 	fi
 elif echo "$BINARY" | grep -q x86; then	
 	if echo "$BINARY" | grep -q x86-64; then
 		DEVICE_ARCH=x86_64
 		DEVICE_IS_64BIT=true
+		KERNEL_FILENAME=bzImage
 	else
 		DEVICE_ARCH=x86
 		DEVICE_IS_64BIT=false
+		KERNEL_FILENAME=bzImage
 	fi
 else
 	# Nothing matches, were you trying to make TWRP for Symbian OS devices, Playstation 2 or PowerPC-based Macintosh?
@@ -281,7 +285,7 @@ loginfo "Device is $DEVICE_ARCH"
 if [ -f "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dt" ]; then
 	loginfo "DTB are not appended to kernel"
 	logstep "Copying kernel..."
-	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-zImage" "$DEVICE_TREE_PATH/prebuilt/zImage"
+	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-zImage" "$DEVICE_TREE_PATH/prebuilt/$KERNEL_FILENAME"
 	logdone
 	logstep "Copying DTB..."
 	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dt" "$DEVICE_TREE_PATH/prebuilt/dt.img"
@@ -289,15 +293,18 @@ if [ -f "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dt" ]; then
 elif [ -f "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dtb" ]; then
 	loginfo "DTB are not appended to kernel"
 	logstep "Copying kernel..."
-	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-zImage" "$DEVICE_TREE_PATH/prebuilt/zImage"
+	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-zImage" "$DEVICE_TREE_PATH/prebuilt/$KERNEL_FILENAME"
 	logdone
 	logstep "Copying DTB..."
 	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-dtb" "$DEVICE_TREE_PATH/prebuilt/dtb.img"
 	logdone
 else
-	loginfo "DTB are appended to kernel"
+	if [ "$DEVICE_ARCH" = arm64 ] || [ "$DEVICE_ARCH" = arm ]; then
+		loginfo "DTB are appended to kernel"
+		KERNEL_FILENAME="${KERNEL_FILENAME}-dtb"
+	fi
 	logstep "Copying kernel..."
-	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-zImage" "$DEVICE_TREE_PATH/prebuilt/zImage-dtb"
+	cp "$SPLITIMG_DIR/$DEVICE_CODENAME.img-zImage" "$DEVICE_TREE_PATH/prebuilt/$KERNEL_FILENAME"
 	logdone
 fi
 
